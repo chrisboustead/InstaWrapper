@@ -6,41 +6,33 @@ Instagram API PHP Wrapper
 See index.php for working sample.
 
 Quick Usage: 
-
-<?php 
-
-// Change these to your Instagram App Details -->
-$client_id = 'CLIENT_ID';
-$secret = 'CLIENT_SECRET';
-$redirect_uri = 'REDIRECT_URI';
-$scope = 'comments';
-
-include('Instagram.php');
-
-$insta = new Instagram(array(
-	'client_id' => $client_id,
-	'client_secret' => $secret,
-	'redirect_uri' => $redirect_uri,
-));
-
-if(!$insta->isAuthenticated()){
-	// User needs to login or authenticate
-	$login_url = $insta->getLoginUrl(array(
-		'scope' => $scope,
-	));
-	header('Location: '.$login_url);
-}
-
-// Show the token
-echo "<br />Token: ";
-var_dump($insta->getToken());
-
-// Show the user data
-echo "<br />User Data: ";
-var_dump($insta->getUserData());
-
-// Make a call to the API
-$circles = $insta->api('tags/cool-tag/media/recent'); 
-var_dump($circles->data);
-
-?>
+<p><br />
+  &lt;?php </p>
+<p>// Change these to your Instagram App Details --&gt;<br />
+  $client_id = 'CLIENT_ID';<br />
+  $secret = 'CLIENT_SECRET';<br />
+  $redirect_uri = 'REDIRECT_URI';<br />
+  $scope = 'comments';</p>
+<p>include('Instagram.php');</p>
+<p>$insta = new Instagram(array(<br />
+  'client_id' =&gt; $client_id,<br />
+  'client_secret' =&gt; $secret,<br />
+  'redirect_uri' =&gt; $redirect_uri,<br />
+  ));</p>
+<p>if(!$insta-&gt;isAuthenticated()){<br />
+  // User needs to login or authenticate<br />
+  $login_url = $insta-&gt;getLoginUrl(array(<br />
+  'scope' =&gt; $scope,<br />
+  ));<br />
+  header('Location: '.$login_url);<br />
+  }</p>
+<p>// Show the token<br />
+  echo &quot;&lt;br /&gt;Token: &quot;;<br />
+  var_dump($insta-&gt;getToken());</p>
+<p>// Show the user data<br />
+  echo &quot;&lt;br /&gt;User Data: &quot;;<br />
+  var_dump($insta-&gt;getUserData());</p>
+<p>// Make a call to the API<br />
+  $circles = $insta-&gt;api('tags/cool-tag/media/recent'); <br />
+  var_dump($circles-&gt;data);</p>
+<p>?&gt;</p>
