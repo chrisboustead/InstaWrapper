@@ -7,7 +7,6 @@ See index.php for working sample.
 
 Quick Usage: 
 <pre>
-<?php
 $client_id = 'CLIENT_ID';
 $secret = 'CLIENT_SECRET';
 $redirect_uri = 'REDIRECT_URI';  //Must Match IG setup Redirect URI
@@ -45,5 +44,4 @@ $circles = $insta->api('tags/'.$tag.'/media/recent');
 
 echo "<br />API Response: ";
 var_dump($circles);
-?>
 </pre>
