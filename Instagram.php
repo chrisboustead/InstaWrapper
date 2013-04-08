@@ -6,10 +6,12 @@ class Instagram{
 	private $auth_url = 'https://api.instagram.com/oauth/access_token';
 	private $login_url = "https://api.instagram.com/oauth/authorize/";
 	private $api_url = 'https://api.instagram.com/v1/';
+    private $sub_url = 'https://api.instagram.com/v1/subscriptions/';
 	private $access_token;
 	private $client_id = null;
 	private $client_secret = null;
 	private $redirect_uri = null;
+    public $sub_callback_uri = null;
 	public $err_msg = false;
 	private $code;
 	private $token;
@@ -172,7 +174,7 @@ class Instagram{
 		
 	}
 	
-	function extractAccessToken($request_res){
+	public function extractAccessToken($request_res){
 		
 		$res_arr = $request_res;
 				
@@ -180,6 +182,45 @@ class Instagram{
 		
 		return $this->access_token;
 	}
+
+    public function createSubscription($obj,$obj_id = null)
+    {
+
+        $url = $this->api_url . 'subscriptions/';
+
+        $qs = array();
+        $qs['client_id'] = $this->client_id;
+        $qs['client_secret'] = $this->client_secret;
+        $qs['object'] = $obj;
+        $qs['aspect'] = 'media';
+        if($obj_id) $qs['object_id'] = $obj_id;
+        $qs['callback_url'] = $this->sub_callback_uri;
+
+        $this->doCurl($this->sub_url, $qs, 'POST');
+
+    }
+
+    public function verifySubscription()
+    {
+        $hub_mode = $_GET['hub.mode'];
+        $hub_challenge = $_GET['hub.challenge'];
+        $hub_verify_token = $_GET['hub.verify_token'];
+
+        if($hub_challenge)
+        {
+            $qs['hub.challenge'] = $hub_challenge;
+            $this->doCurl($this->sub_url, $qs, 'POST');
+            return true;
+        }
+        return null;
+    }
+
+    public function subscriptionCallback()
+    {
+        // Do we need to verify the subscription?
+        $this->verifySubscription();
+
+    }
 	
 }
 ?>
