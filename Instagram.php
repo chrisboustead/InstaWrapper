@@ -7,6 +7,7 @@ class Instagram{
 	private $login_url = "https://api.instagram.com/oauth/authorize/";
 	private $api_url = 'https://api.instagram.com/v1/';
     private $sub_url = 'https://api.instagram.com/v1/subscriptions/';
+    private $sub_delete_url = 'https://api.instagram.com/v1/subscriptions';
 	private $access_token;
 	private $client_id = null;
 	private $client_secret = null;
@@ -134,7 +135,19 @@ class Instagram{
 	
 	public function api($endpoint, $method = 'get', $params = null){
 		$access_str = '?access_token='.$this->getToken();
-		return json_decode(file_get_contents($this->api_url . $endpoint . $access_str, $method));
+        $param_str = '';
+        if($params){
+            foreach($params as $k => $v)
+            {
+                $param_str .= '&'.$k.'='.$v;
+            }
+        }
+        $url = '';
+        if(stristr($endpoint,'api.instagram.com') === false)
+        {
+            $url = $this->api_url.$endpoint;
+        }
+		return json_decode(file_get_contents($url . $access_str . $param_str, $method));
 	}
 	
 	private function doCurl($url, $query_string = null, $method, $ssl=false){
@@ -146,9 +159,13 @@ class Instagram{
 		// Set request method
 		if(strtolower($method) == 'post') {
 			curl_setopt($this->ch, CURLOPT_POST, 1);
-		}else{
+		}elseif(strtolower($method) == 'get'){
 			curl_setopt($this->ch, CURLOPT_POST, 0);
+		}else{
+            echo $method;
+            curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, $method);
 		}
+
 		
 		// Set query data here with CURLOPT_POSTFIELDS
 		if ($query_string) curl_setopt($this->ch, CURLOPT_POSTFIELDS, $query_string);
@@ -183,7 +200,7 @@ class Instagram{
 		return $this->access_token;
 	}
 
-    public function createSubscription($obj,$obj_id = null)
+    public function createSubscription($obj,$callback_uri = null,$obj_id = null)
     {
 
         $url = $this->api_url . 'subscriptions/';
@@ -194,9 +211,23 @@ class Instagram{
         $qs['object'] = $obj;
         $qs['aspect'] = 'media';
         if($obj_id) $qs['object_id'] = $obj_id;
-        $qs['callback_url'] = $this->sub_callback_uri;
+        $qs['callback_url'] = ($callback_uri) ? $callback_uri : $this->sub_callback_uri;
 
-        $this->doCurl($this->sub_url, $qs, 'POST');
+        return $this->doCurl($this->sub_url, $qs, 'POST');
+
+    }
+
+    public function deleteSubscription($obj,$sub_id)
+    {
+
+        $url = $this->api_url . 'subscriptions/';
+
+        $qs = '';
+        $qs = '?client_secret='.$this->client_secret;
+        $qs .= '&id='.$sub_id;
+        $qs .= '&client_id='.$this->client_id;
+
+        return $this->doCurl($this->sub_url . $qs, null, 'DELETE');
 
     }
 
@@ -209,8 +240,7 @@ class Instagram{
         if($hub_challenge)
         {
             $qs['hub.challenge'] = $hub_challenge;
-            $this->doCurl($this->sub_url, $qs, 'POST');
-            return true;
+            return $this->doCurl($this->sub_url, $qs, 'POST');
         }
         return null;
     }
@@ -221,6 +251,12 @@ class Instagram{
         $this->verifySubscription();
 
     }
-	
+    public function viewSubscriptions()
+    {
+        // Do we need to verify the subscription?
+        $res = json_decode($this->doCurl('https://api.instagram.com/v1/subscriptions?client_secret='.$this->client_secret.'&client_id='.$this->client_id, null, 'GET'));
+        return $res->data;
+    }
+
+
 }
-?>
