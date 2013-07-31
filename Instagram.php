@@ -147,7 +147,8 @@ class Instagram{
         {
             $url = $this->api_url.$endpoint;
         }
-		return json_decode(file_get_contents($url . $access_str . $param_str, $method));
+		//return json_decode(file_get_contents($url . $access_str . $param_str, $method));
+		return json_decode($this->doCurl($url . $access_str . $param_str, null, $method));
 	}
 	
 	private function doCurl($url, $query_string = null, $method, $ssl=false){
